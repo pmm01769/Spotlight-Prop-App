@@ -7,13 +7,13 @@
 //
 //Test comment
 //i need lunch
-#import "SecondViewController.h"
+#import "LocationViewController.h"
 
-@interface SecondViewController ()
+@interface LocationViewController ()
 
 @end
 
-@implementation SecondViewController
+@implementation LocationViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -24,6 +24,22 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+- (IBAction)editToggled:(id)sender { if (_segViewEdit.selectedSegmentIndex == 1)
+{
+    
+    _txtLocation.enabled = true;
+    
+    
+    
+}
+else
+{
+  
+    _txtLocation.enabled = false;
+    
+}
+    
 }
 
 

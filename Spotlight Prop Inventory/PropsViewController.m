@@ -7,8 +7,8 @@
 //pmm01769@bitbucket.org:Arthrougs/spotlight-prop-inventory.git
 
 #import "PropsViewController.h"
-#import "AppDelegate.h"
 #import "Props+CoreDataClass.h"
+#import "AppDelegate.h"
 
 @interface PropsViewController ()
 
@@ -19,6 +19,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+if (_prop)
+{
+    _txtProp.text = _prop.propName;
+    _txtLocation.text = _prop.location;
+    _txtImage.text = _prop.path;
+    
+    
+}
+    
+    
 }
 
 
@@ -30,7 +40,7 @@
 {
     _txtProp.enabled =true;
     _txtLocation.enabled = true;
-    
+    _txtImage.enabled = true;
     
     
 }
@@ -38,7 +48,7 @@
    {
        _txtProp.enabled = false;
        _txtLocation.enabled = false;
-       
+       _txtImage.enabled = false;
    }
     
 }
@@ -49,10 +59,18 @@
 - (IBAction)saveProp:(id)sender {
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSManagedObjectContext *context = appDelegate.persistentContainer.viewContext;
-    Props *prop = [NSEntityDescription insertNewObjectForEntityForName:@"Props" inManagedObjectContext:context];
+  //  Props *prop = [NSEntityDescription insertNewObjectForEntityForName:@"Props" inManagedObjectContext:context];
     NSError *error;
-    [prop setValue:_txtProp.text forKey:@"propName"];
-    [prop setValue:_txtLocation.text forKey:@"location"];
+    if (!_prop)
+    {
+        
+        _prop = [NSEntityDescription insertNewObjectForEntityForName:@"Props" inManagedObjectContext:context];
+        
+        
+    }
+    [_prop setValue:_txtProp.text forKey:@"propName"];
+    [_prop setValue:_txtLocation.text forKey:@"location"];
+    [_prop setValue:_txtImage.text forKey:@"path"];
     
     
     [context save:&error];
@@ -68,6 +86,7 @@
     
     _txtProp.enabled = false;
     _txtLocation.enabled = false;
+    _txtImage.enabled = false;
     
 }
 

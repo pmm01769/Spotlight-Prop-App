@@ -8,6 +8,6 @@
 
 #import <CoreData/CoreData.h>
 
-@interface Prop : NSManagedObject
+@interface Props : NSManagedObject
 
 @end

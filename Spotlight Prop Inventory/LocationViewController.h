@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SecondViewController : UIViewController
+@interface LocationViewController : UIViewController
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segViewEdit;
+@property (weak, nonatomic) IBOutlet UITextField *txtLocation;
 
 
 @end

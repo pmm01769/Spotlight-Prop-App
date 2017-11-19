@@ -7,6 +7,8 @@
 //
 
 #import "PropsTableViewController.h"
+#import "PropsViewController.h"
+
 
 @interface PropsTableViewController ()
 
@@ -15,7 +17,7 @@
 @implementation PropsTableViewController
 NSArray *props;
 AppDelegate *appDelegate;
-NSManagedObject *context;
+NSManagedObjectContext *context;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -25,9 +27,12 @@ NSManagedObject *context;
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+//props = @[@"Moe", @"Larry", @"Curly"];
     [self loadDataFromDatabase];
 
 }
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -55,12 +60,14 @@ NSManagedObject *context;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
     
     Props *prop = [props objectAtIndex:[indexPath row]];
-    
-    cell.textLabel.text = [props objectAtIndex:[indexPath row]];
-    
+
+    cell.textLabel.text = [prop propName];
+    cell.detailTextLabel.text = [prop location];
+    cell.imageView.image = [UIImage imageNamed:[prop path]];
     return cell;
 
 }
+
 
 
 /*
@@ -106,32 +113,49 @@ NSManagedObject *context;
     // Pass the selected object to the new view controller.
 }
 */
-#pragma mark - Core Data methods
-- (void) loadDataFromDatabase {
-    // read stored settings
-    NSUserDefaults *settings = [NSUserDefaults standardUserDefaults];
-    NSString *sortField = [settings stringForKey:@"sortField"];
-    bool sortAscending = [settings boolForKey:@"sortDirectionAscending"];
-    
-    
-    appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    context = appDelegate.persistentContainer.viewContext;
-    
-    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Props"
-        inManagedObjectContext:context];
-    NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:entityDescription];
-    
-    //add sort descriptor
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:sortField ascending:sortAscending];
-    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-    request.sortDescriptors = sortDescriptors;  //only one field to sort on
-    
-    NSError *error;
-   // props = [[NSArray alloc]initWithArray:[context executeFetchRequest: request error:&error]];
+#pragma mark - Navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+   
+    if([segue.identifier isEqualToString:@"ViewProps"]){
+        PropsViewController *propController = segue.destinationViewController;
+        NSIndexPath *selectedPath = [self.tableView indexPathForSelectedRow];
+        Props *selectedProp = [props objectAtIndex:[selectedPath row]];
+        propController.prop = selectedProp;
+    }
     
 }
-#pragma mark - Navigation
+- (void) loadDataFromDatabase {
+    appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    context = appDelegate.persistentContainer.viewContext;
+    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Props" inManagedObjectContext:context];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entityDescription];
+    NSError *error;
+props = [[NSArray alloc]initWithArray:[context executeFetchRequest:request error:&error]];
+    
+}
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        // Delete the row from the data source
+        Props *propToDelete = [props objectAtIndex:[indexPath row]];
+        [context deleteObject:propToDelete];
+        NSError *error;
+        [context save:&error];
+        [self loadDataFromDatabase];
+        
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
+        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+    }
+}
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self loadDataFromDatabase];
+    [self.tableView reloadData];
+}
+
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 
